@@ -24,6 +24,9 @@ public class Vector2D {
     public Vector2D add(Vector2D v){
         return new Vector2D(x+v.getX(),y+v.getY());
     }
+     public Vector2D subtract(Vector2D v){
+        return new Vector2D(x-v.getX(),y-v.getY());
+    }
     public Vector2D scale( double value){
         return new Vector2D(x*value,y*value);
     }
@@ -48,6 +51,9 @@ public class Vector2D {
     public Vector2D setDireccion(double angulo){
         double magnitude=getMagnitude();
         return new Vector2D( Math.cos(angulo)*magnitude,Math.sin(angulo)*magnitude);
+    }
+    public double getAngulo(){
+        return Math.asin(y/getMagnitude());
     }
     public double getX() {
         return x;

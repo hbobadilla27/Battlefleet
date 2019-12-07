@@ -13,20 +13,18 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 public class KeyBoard implements KeyListener{
     private boolean[] keys= new boolean[256];
-    public static boolean UP,LEFT,RIGHT,DOWN,disparar=false;
+    public static boolean UP,LEFT,RIGHT,disparar;
     public KeyBoard(){
         
         UP=false;
         LEFT=false;
-        RIGHT=false;
-        DOWN=false;
+        RIGHT=false;        
         disparar=false;
     }
     public void actualizar(){
         UP=keys[KeyEvent.VK_W];
         LEFT=keys[KeyEvent.VK_A];
-        RIGHT=keys[KeyEvent.VK_D];
-        DOWN=keys[KeyEvent.VK_S];
+        RIGHT=keys[KeyEvent.VK_D];      
         disparar=keys[KeyEvent.VK_L];
         
     }

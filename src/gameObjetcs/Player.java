@@ -46,7 +46,7 @@ public class Player extends MovimientoObjetos {
         
         if(KeyBoard.disparar && !fireRate.isRunning()){
             gameState.getMovimientoObjetos().add(0,new Laser(
-                    getCenter().add(direccion.scale(ancho/2)),
+                    getCenter().add(direccion.scale(ancho)),
                     direccion,
                     Constantes.velLaser,
                     angulo,
@@ -60,8 +60,7 @@ public class Player extends MovimientoObjetos {
             angulo+=Constantes.rota;
         if(KeyBoard.LEFT)
             angulo-=Constantes.rota;
-        if(KeyBoard.DOWN)
-            angulo=0;
+        
             
         if(KeyBoard.UP){
               aceleracion=direccion.scale(Constantes.ACC);
@@ -92,7 +91,7 @@ public class Player extends MovimientoObjetos {
         
        
         fireRate.actualizar();
-        
+        colision();
     }
 
     @Override
@@ -110,13 +109,12 @@ public class Player extends MovimientoObjetos {
 
        rotar= AffineTransform.getTranslateInstance(position.getX(), position.getY());
        rotar.rotate(angulo,ancho/2,altura/2);
-       g2d.drawImage(Assets.player, rotar,null);
+       g2d.drawImage(texture, rotar,null);
     }
     
-    public Vector2D getCenter(){
-        return new Vector2D(position.getX()+ancho/2,position.getY()+altura/2);
-    }
-
+    
+   
+   
   
      
 }

@@ -32,11 +32,9 @@ public class Laser extends MovimientoObjetos {
         //Eliminar los laser
         if(position.getX()<0 || position.getX()>Constantes.ancho ||
                 position.getY()<0 || position.getY()>Constantes.altura){
-            gameState.getMovimientoObjetos().remove(this);
-            
-            
+            Destruir();
         }
-      
+        colision();
     }
 
     @Override
@@ -46,6 +44,10 @@ public class Laser extends MovimientoObjetos {
           rotar.rotate(angulo,ancho/2,0);
           g2d.drawImage(texture, rotar,null);
         
+    }
+    @Override
+    public Vector2D getCenter(){
+        return new Vector2D(position.getX()+ancho/2,position.getY()+ancho/2);
     }
     
 }

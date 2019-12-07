@@ -9,8 +9,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+
+
 import javax.swing.JFrame;
 import states.GameState;
 
@@ -24,14 +25,14 @@ public class Ventana extends JFrame implements Runnable{
     
     private final int FPS=60;
     private double TARGETIME=1000000000/FPS;
-    
     private double delta=0;//cambio con respecto al tiempo ue pasa
     private int AVERAGEFPS=FPS;
+   
     private GameState gameState;
     private KeyBoard keyBoard;
     
     public Ventana(){
-        setTitle("Iron Man");
+        setTitle("Battlefleet");
         setSize(Constantes.ancho,Constantes.altura);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
@@ -63,14 +64,15 @@ public class Ventana extends JFrame implements Runnable{
     }
     private void dibujar(){
        bs=canvas.getBufferStrategy();
+       
        if(bs==null){
            canvas.createBufferStrategy(3);//numero de bufeer que utiliza csnvas
             return;
        }
        
        g=bs.getDrawGraphics();
-       g.setColor(Color.BLACK);
-       g.fillRect(0,0,Constantes.ancho,Constantes.ancho);
+       //g.setColor(Color.BLACK);
+       g.drawImage(Assets.space, 0, 0,Constantes.ancho, Constantes.altura, this);
        gameState.dibujar(g);
        g.drawString(""+AVERAGEFPS,10,20);
        
@@ -120,7 +122,7 @@ public class Ventana extends JFrame implements Runnable{
     private void Start(){  //metodo iniciar el hilo
         hilo= new Thread(this); //esta clase implemnta el Runnable(interfas)
         hilo.start();//llama el metodo run
-         running=true; 
+        running=true; 
     }
     private void stop(){ 
         try {
