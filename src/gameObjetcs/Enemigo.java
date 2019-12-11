@@ -2,6 +2,7 @@
 package gameObjetcs;
 
 import graphics.Assets;
+import graphics.Sonido;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -17,6 +18,7 @@ public class Enemigo extends MovimientoObjetos {
     private Vector2D currentNodo;
     private int index;
     private boolean following;
+    private Sonido shoot;
     public Enemigo(Vector2D position, Vector2D velocidad, double maxVelocidad, BufferedImage texture,ArrayList<Vector2D> path, GameState gameState) {
         super(position, velocidad, maxVelocidad, texture, gameState);
         this.path=path;
@@ -24,6 +26,7 @@ public class Enemigo extends MovimientoObjetos {
         following=true;
         fireRate =new Tiempo();
         fireRate.run(Constantes.enemfireRate);
+        shoot=new Sonido(Assets.ufoShoot);
     }
     private Vector2D pathFollowing(){
         currentNodo=path.get(index);
@@ -81,9 +84,13 @@ public class Enemigo extends MovimientoObjetos {
             
             gameState.getMovimientoObjetos().add(0,laser);
             fireRate.run(Constantes.enemfireRate);
+            
+            shoot.play();
                     
         }   
-        
+        if(shoot.getFramePosition()>9000){
+            shoot.stop();
+        }
         angulo+=0.05; 
         colision();
         fireRate.actualizar();
@@ -92,7 +99,7 @@ public class Enemigo extends MovimientoObjetos {
     }
      @Override
     public void Destruir(){
-        gameState.addScore(Constantes.enemScore);
+        gameState.addScore(Constantes.enemScore,position);
         super.Destruir();
     }
     @Override

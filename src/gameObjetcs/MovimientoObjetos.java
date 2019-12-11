@@ -1,6 +1,7 @@
 
 package gameObjetcs;
 import graphics.Assets;
+import graphics.Sonido;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ public abstract class MovimientoObjetos extends GameObject {
     protected int ancho;
     protected int altura;
     protected GameState gameState;
+    private Sonido explo;
     
     public MovimientoObjetos(Vector2D position,Vector2D velocidad,double maxVelocidad, BufferedImage texture,GameState gameState){
         
@@ -28,6 +30,7 @@ public abstract class MovimientoObjetos extends GameObject {
         ancho=texture.getWidth();
         altura=texture.getHeight();
         angulo=0;
+        explo=new Sonido(Assets.explo);
     }
     protected void colision(){
         
@@ -46,7 +49,15 @@ public abstract class MovimientoObjetos extends GameObject {
          
     }
     private void objectCollision(MovimientoObjetos a,MovimientoObjetos b){
-        if(!(a instanceof Meteoro && b instanceof Meteoro)){
+        if(a instanceof Player &&((Player)a).isSpawning()){
+            return;
+        }
+         if(b instanceof Player &&((Player)b).isSpawning()){
+            return;
+        }
+       
+         
+         if(!(a instanceof Meteoro && b instanceof Meteoro)){
             gameState.playExplosion(getCenter());
             a.Destruir();
             b.Destruir();
@@ -55,6 +66,8 @@ public abstract class MovimientoObjetos extends GameObject {
     }
     protected void Destruir(){
         gameState.getMovimientoObjetos().remove(this);
+        if(!(this instanceof Laser) )
+            explo.play();
     }
     protected  Vector2D getCenter()
     {

@@ -4,6 +4,7 @@ package Main;
 import gameObjetcs.Constantes;
 import graphics.Assets;
 import input.KeyBoard;
+import input.Mouse;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -12,8 +13,13 @@ import java.awt.image.BufferStrategy;
 
 
 
+
+
+
 import javax.swing.JFrame;
 import states.GameState;
+import states.MenuState;
+import states.State;
 
 
 public class Ventana extends JFrame implements Runnable{
@@ -28,8 +34,9 @@ public class Ventana extends JFrame implements Runnable{
     private double delta=0;//cambio con respecto al tiempo ue pasa
     private int AVERAGEFPS=FPS;
    
-    private GameState gameState;
+    
     private KeyBoard keyBoard;
+    private Mouse mouse;
     
     public Ventana(){
         setTitle("Battlefleet");
@@ -41,6 +48,7 @@ public class Ventana extends JFrame implements Runnable{
         
         canvas =new Canvas();        
         keyBoard=new KeyBoard();
+        mouse=new Mouse();
         
         canvas.setPreferredSize(new Dimension(Constantes.ancho,Constantes.altura)); //limitarlo 
         canvas.setMaximumSize(new Dimension(Constantes.ancho,Constantes.altura));
@@ -49,6 +57,8 @@ public class Ventana extends JFrame implements Runnable{
         
         add(canvas);
         canvas.addKeyListener(keyBoard);
+        canvas.addMouseListener(mouse);
+        canvas.addMouseMotionListener(mouse);
         setVisible(true);
         
     }
@@ -60,7 +70,7 @@ public class Ventana extends JFrame implements Runnable{
   
     private void actualizar(){
         keyBoard.actualizar();
-        gameState.actualizar();
+        State.getestadoActual().actualizar();
     }
     private void dibujar(){
        bs=canvas.getBufferStrategy();
@@ -71,9 +81,9 @@ public class Ventana extends JFrame implements Runnable{
        }
        
        g=bs.getDrawGraphics();
-       //g.setColor(Color.BLACK);
+       
        g.drawImage(Assets.space, 0, 0,Constantes.ancho, Constantes.altura, this);
-       gameState.dibujar(g);
+       State.getestadoActual().dibujar(g);
        g.drawString(""+AVERAGEFPS,10,20);
        
       
@@ -81,43 +91,54 @@ public class Ventana extends JFrame implements Runnable{
        bs.show();
     }
     
-    private void init(){
-        Assets.init();
-        gameState=new GameState();
-    }
+    private void init()  {
+       
+        
+            Assets.init();
+        
+            State.cambiarEstado(new MenuState());
+        } 
+    
     
     
     
     @Override //define el cuerpo abstracto run
     public void run() {
-       long now=0;
-       long lastTime=System.nanoTime();//hora actual del sistema en nanosegundos
-       int frames=0;
-       long time=0;
-       init();
-       while(running){
-           now=System.nanoTime();
-           delta+=(now-lastTime)/TARGETIME;
-           time+=(now-lastTime);
-           lastTime=now;
-           
-           if(delta>=1){
-                actualizar(); 
-                dibujar();
-                delta--;
-                frames++;
-               
-           }
-           
-           if(time>=1000000000){
-               AVERAGEFPS=frames;              
-               frames=0;
-               time=0;
-               
-           }
-        }
-        stop();
-    }
+        
+            long now=0;
+            long lastTime=System.nanoTime();//hora actual del sistema en nanosegundos
+            int frames=0;
+            long time=0;
+            
+        
+            init();
+        
+        
+    
+            while(running){
+                now=System.nanoTime();
+                delta+=(now-lastTime)/TARGETIME;
+                time+=(now-lastTime);
+                lastTime=now;
+                
+                if(delta>=1){
+                    actualizar();
+                    dibujar();
+                    delta--;
+                    frames++;
+                    
+                }
+                
+                if(time>=1000000000){
+                    AVERAGEFPS=frames;
+                    frames=0;
+                    time=0;
+                    
+                }
+            }
+            stop();
+        } 
+    
     
     private void Start(){  //metodo iniciar el hilo
         hilo= new Thread(this); //esta clase implemnta el Runnable(interfas)

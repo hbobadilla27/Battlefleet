@@ -8,6 +8,7 @@ package gameObjetcs;
 
 import Main.Ventana;
 import graphics.Assets;
+import graphics.Sonido;
 import input.KeyBoard;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -26,6 +27,11 @@ public class Player extends MovimientoObjetos {
     private boolean aceleration=false;
     private Tiempo fireRate;
     
+    private boolean  spawning,visible;
+    private Tiempo spawnTime,parpadearTime;
+    private Sonido disparo,loose;
+    
+    
     
     
     
@@ -36,15 +42,28 @@ public class Player extends MovimientoObjetos {
         direccion=new Vector2D(0,1);
         aceleracion=new Vector2D();
         fireRate=new Tiempo();
-        
+        spawnTime=new Tiempo();
+        parpadearTime=new Tiempo();
+        disparo=new Sonido(Assets.playerlaser);
+        loose=new Sonido(Assets.playerLoose);
         
     }
 
     
     @Override
     public void actualizar() {
+        if(!spawnTime.isRunning()){
+            spawning=false;
+            visible=true;
+        }
+        if(spawning){
+            if(!parpadearTime.isRunning()){
+                parpadearTime.run(Constantes.parpadearTime);
+                visible=!visible;
+            }
+        }
         
-        if(KeyBoard.disparar && !fireRate.isRunning()){
+        if(KeyBoard.disparar && !fireRate.isRunning() && !spawning){
             gameState.getMovimientoObjetos().add(0,new Laser(
                     getCenter().add(direccion.scale(ancho)),
                     direccion,
@@ -55,7 +74,14 @@ public class Player extends MovimientoObjetos {
             
             ));
         fireRate.run(Constantes.velDispara);
+        disparo.play();
         }
+        
+        if(disparo.getFramePosition()>9000){
+            disparo.stop();
+        }
+            
+        
         if(KeyBoard.RIGHT)
             angulo+=Constantes.rota;
         if(KeyBoard.LEFT)
@@ -91,11 +117,31 @@ public class Player extends MovimientoObjetos {
         
        
         fireRate.actualizar();
+        spawnTime.actualizar();
+        parpadearTime.actualizar();
         colision();
     }
-
+    @Override
+    public void Destruir(){
+        spawning=true;
+        spawnTime.run(Constantes.spawnTime);
+        loose.play();
+        resetValue();
+        gameState.restarVida();
+    }
+    
+    private void resetValue(){
+        angulo=0;
+        velocidad=new Vector2D();
+        position=new Vector2D(Constantes.ancho/2- Assets.player.getWidth()/2,
+        Constantes.altura/2-Assets.player.getHeight()/2);
+    }
+    
+    
     @Override
     public void dibujar(Graphics g) {
+       if(!visible)
+           return;
        Graphics2D g2d=(Graphics2D)g;
        AffineTransform rotar1= AffineTransform.getTranslateInstance(position.getX()+ancho/2 +9, position.getY()+altura/2 +8);
        AffineTransform rotar2= AffineTransform.getTranslateInstance(position.getX()+16, position.getY()+altura/2 +8);
@@ -112,6 +158,10 @@ public class Player extends MovimientoObjetos {
        g2d.drawImage(texture, rotar,null);
     }
     
+    public boolean isSpawning(){
+        return spawning;
+    }
+        
     
    
    

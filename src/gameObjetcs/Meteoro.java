@@ -46,7 +46,7 @@ public class Meteoro extends MovimientoObjetos{
     @Override
     public void Destruir(){
         gameState.divideMeteoro(this);
-        gameState.addScore(Constantes.MetScore);
+        gameState.addScore(Constantes.MetScore,position);
         super.Destruir();
         
     }

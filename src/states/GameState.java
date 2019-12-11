@@ -9,27 +9,45 @@ package states;
  *
  * @author Cabrón en que lo cambie!
  */
+
 import gameObjetcs.Constantes;
 import gameObjetcs.Enemigo;
+import gameObjetcs.Mensajes;
 import gameObjetcs.Meteoro;
 import gameObjetcs.MovimientoObjetos;
 import gameObjetcs.Player;
 import gameObjetcs.Tamaños;
 import graphics.Animacion;
 import graphics.Assets;
+import graphics.Sonido;
+import graphics.Texto;
+import java.awt.Color;
+
+
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+
+
+
 import math.Vector2D;
-public class GameState {
+public class GameState extends State{
+    public static final Vector2D PLAYER_START_POSITION = new Vector2D(Constantes.ancho/2 - Assets.player.getWidth()/2,
+			Constantes.altura/2 - Assets.player.getHeight()/2);
     private Player player;
     private ArrayList<MovimientoObjetos> movimientoObjetos=new ArrayList<MovimientoObjetos>();
     private ArrayList<Animacion> explosion=new ArrayList<Animacion>();
+    private ArrayList<Mensajes> mensajes = new ArrayList<Mensajes>();
+    
     private int score=0;
     private int lifes=3;
     private int meteoro;
+    private int waves=1;
+    private Sonido musica,playerlaser;
+    
     
     
     public GameState(){
@@ -37,10 +55,18 @@ public class GameState {
         movimientoObjetos.add(player);
         meteoro=2;
         starWave();
+        musica=new Sonido(Assets.musica);
+        playerlaser=new Sonido(Assets.playerlaser);
+        musica.loop();
+        
+        musica.changeVolumen( -11.0f);
+        playerlaser.changeVolumen( -5.0f);
     }
     
-    public void addScore(int value){
+    public void addScore(int value,Vector2D position){
         score+=value;
+        mensajes.add(new Mensajes (position,true,"+"+value+" score",Color.BLACK,false,Assets.fontMed,this))
+        ;
     }
     public void divideMeteoro(Meteoro meteoro){
         Tamaños tamaño=meteoro.getTamaños();
@@ -75,6 +101,11 @@ public class GameState {
         
     }
     private void starWave(){
+        mensajes.add(new Mensajes(new Vector2D(Constantes.ancho/2, Constantes.altura/2), true,
+				"NIVEL "+waves, Color.BLACK, true, Assets.fontBig, this));
+        
+        
+        
         double x,y;
         for(int i=0;i<meteoro;i++){
             x=i%2==0?Math.random()*Constantes.ancho:0;
@@ -92,7 +123,7 @@ public class GameState {
             
         
         }
-        meteoro+=1;
+        meteoro++;
         spawnEnemigo();
     }
     public void playExplosion(Vector2D position){
@@ -164,6 +195,10 @@ public class GameState {
         Graphics2D g2d=(Graphics2D)g;
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR );
         
+        for(int i=0;i<mensajes.size();i++)
+            mensajes.get(i).dibujar(g2d);
+        
+        
         for(int i=0;i<movimientoObjetos.size();i++)
             movimientoObjetos.get(i).dibujar(g);
         
@@ -174,10 +209,11 @@ public class GameState {
          }
          drawScore(g);
          drawVida(g);
+         //Texto.dibujarTexto(g,"NIVEL "+waves,new Vector2D(Constantes.ancho/2,Constantes.altura/2),true,Color.BLACK,Assets.fontBig);    
     }
     private void drawScore(Graphics g){
         //Dibujamos el score
-        Vector2D posi=new Vector2D(1000,25);
+        Vector2D posi=new Vector2D(900,25);
         
         String scoreToString= Integer.toString(score);
         for( int i=0;i<scoreToString.length();i++){
@@ -217,10 +253,15 @@ public class GameState {
         
   
     }
+     public ArrayList<Mensajes> getMensajes() {
+        return mensajes;
+     }
     public Player getPlayer(){
         return player;
     }
-    
+    public void restarVida(){
+        lifes --;
+    }
 }
 
 
